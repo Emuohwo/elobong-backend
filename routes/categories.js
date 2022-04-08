@@ -53,6 +53,7 @@ router.delete('/:id', (req, res) => {
         return res.status(400).json({ success: false, error: err})
     })
 })
+
 router.get('/:id', async (req, res) => {
     const category = await Category.findById(req.params.id)
 
