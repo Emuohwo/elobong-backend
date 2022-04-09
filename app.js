@@ -14,13 +14,29 @@ const categoriesRoutes = require('./routes/categories');
 const productRoutes = require('./routes/products');
 const usersRoutes = require('./routes/users');
 const ordersRoutes = require('./routes/orders');
+const authJwt = require('./helpers/jwt');
+const errorHandler = require('./helpers/error_handler')
 
 
 const api = process.env.API_URL
 
 // Middleware
 app.use(express.json());
-app.use(morgan('tiny'))
+app.use(morgan('tiny'));
+app.use(authJwt())
+// app.use(errorHandler())
+app.use((err, req, res, next) => {
+    if (err.name === 'UnauthorizedError') {
+        return res.status(401).json({ message: 'User not authorized' })
+    } 
+
+    if (err.name === 'ValidationError') {
+        return res.status(401).json({ message: err })
+    }
+
+    return res.status(500).json({ message: err })
+})
+
 app.use(`${api}/categories`, categoriesRoutes)
 app.use(`${api}/products`, productRoutes)
 app.use(`${api}/users`, usersRoutes)
